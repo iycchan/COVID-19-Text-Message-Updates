@@ -42,6 +42,7 @@ phoneNumbers = settings.get('Phone Numbers')
 phoneNumbers = phoneNumbers.split(',')
 phoneNumbers = [x.strip(' ') for x in phoneNumbers]
 country = settings.get('Country')
+country = country.lower()
 
 def tryAndExcept():
     try:
@@ -55,24 +56,25 @@ def getData():
     gc.collect()
     global oldData
     try:
-        with open("canada", "r") as rawoldData:
+        with open(country, "r") as rawoldData:
             oldData = rawoldData.read()
+        pass
     except:
         print("No previous data")
         oldData = 'none'
     print("Attempting to get data...")
     url = 'http://corona.lmao.ninja/countries/' + country
     r = requests.get(url)
-    with open('canada', 'wb') as outfile:
+    with open(country, 'wb') as outfile:
         outfile.write(r.content)
         print("Got data!")
     processData()
     
 def processData():
     print("Processing data...")
-    with open("canada", "r") as dataFile:
+    with open(country, "r") as dataFile:
         data = dataFile.read()
-        formattedData = json.loads(data)
+        formattedData = json.loads(str(data))
     compareData(oldData, data, formattedData)
         
 def compareData(oldData, newData, data):
@@ -102,7 +104,6 @@ def sendMessage(data):
         from_= fromNumber,
         body="COVID-19 Updates\n\nTotal cases: "+str(totalCases)+"\nCases today: "+str(todayCases)+"\nRecovered: "+str(recovered)+"\nTotal deaths: "+str(totalDeath)+"\nDeaths today: "+str(todayDeath))
         print(message.sid)
-    pass
-    
+    pass 
 while True:
     tryAndExcept()
